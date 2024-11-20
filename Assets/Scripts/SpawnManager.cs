@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Object;
-using FishNet.Connection;
-using FishNet.Managing.Server;
 
 public class SpawnManager : NetworkBehaviour
 {
@@ -12,49 +10,61 @@ public class SpawnManager : NetworkBehaviour
     private bool powerupRoutineStarted = false;
     [SerializeField] private List<GameObject> spawnedPowerUp = new List<GameObject>();
 
-    // Method to start the power-up spawning routine
-    [Server]
-    public void StartPowerupRoutine()
+
+    public override void OnStartServer()
     {
-        if (!powerupRoutineStarted)
+        base.OnStartServer(); // Call the base class implementation
+        StartPowerupRoutineServerRpc(); // Start the spawning routine on the server
+    }
+
+
+    // Method to start the power-up spawning routine
+    [ServerRpc(RequireOwnership = false)]
+    public void StartPowerupRoutineServerRpc()
+    {
+        if (IsServer && !powerupRoutineStarted)
         {
             StartCoroutine(SpawnPowerupRoutine());
             powerupRoutineStarted = true;
         }
     }
 
+
     // Coroutine to spawn power-up every 3 seconds
     IEnumerator SpawnPowerupRoutine()
     {
+        Debug.Log("SpawnPowerupRoutine started.");
         while (true)
         {
             for (int i = 0; i < 3; i++)
             {
-                yield return new WaitForSeconds(1); // Wait for 3 seconds
+                yield return new WaitForSeconds(3); // Wait for 3 seconds
 
                 // Check if the number of power-ups in the area is less than 1 before spawning
                 if (CountPowerupsInArea() <= 1)
                 {
+                    Debug.Log("Spawning a power-up.");
                     // Spawn a power-up only on the server
                     GameObject powerUp = Instantiate(powerupPrefab, GenerateSpawnPosition(), Quaternion.identity);
-                    Spawn(powerUp);
                     spawnedPowerUp.Add(powerUp);
+                    ServerManager.Spawn(powerUp);
                 }
             }
         }
     }
 
+    // Add this method in SpawnManager.cs
     [ServerRpc(RequireOwnership = false)]
-    public void DestroyPowerupServerRpc(int networkObjectId)
+    public void DestroyPowerupServerRpc(ulong networkObjectId)
     {
         foreach (var powerup in spawnedPowerUp)
         {
-            if (powerup.GetComponent<NetworkObject>().ObjectId == networkObjectId)
+            if (powerup.GetComponent<NetworkObject>().NetworkObjectId == networkObjectId)
             {
+                powerup.GetComponent<NetworkObject>().Despawn();
                 spawnedPowerUp.Remove(powerup);
-                base.Despawn(powerup);
                 Destroy(powerup);
-                break;
+                break; // Exit loop once the power-up is found and destroyed
             }
         }
     }
@@ -73,8 +83,10 @@ public class SpawnManager : NetworkBehaviour
     private int CountPowerupsInArea()
     {
         int count = 0;
-        foreach (GameObject powerup in spawnedPowerUp)
+        GameObject[] powerups = GameObject.FindGameObjectsWithTag("Powerup"); // Assuming power-ups have a "Powerup" tag
+        foreach (GameObject powerup in powerups)
         {
+            // Assuming the spawn area is within the range of 'spawnRange'
             if (Vector3.Distance(powerup.transform.position, Vector3.zero) < spawnRange)
             {
                 count++;

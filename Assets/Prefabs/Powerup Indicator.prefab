@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3434097036702038512}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.511964e-12, y: 2.0926359, z: 2.0838566}
+  m_LocalPosition: {x: -1.0839074, y: 0.59263575, z: 2.2113209}
   m_LocalScale: {x: 3, y: 1, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -134,7 +134,7 @@ MonoBehaviour:
   <AssetPathHash>k__BackingField: 3890345484982544523
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
-    Position: {x: -4.511964e-12, y: 2.0926359, z: 2.0838566}
+    Position: {x: -1.0839074, y: 0.59263575, z: 2.2113209}
     Rotation: {x: 0, y: -0, z: -0, w: 1}
     LocalScale: {x: 3, y: 1, z: 3}
 --- !u!114 &1102170120563578759

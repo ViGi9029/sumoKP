@@ -56,7 +56,7 @@ public class PlayerController : NetworkBehaviour
 
             if (base.IsServerInitialized)
             {
-                spawnManager.DestroyPowerupServerRpc(other.GetComponent<NetworkObject>().ObjectId);
+                spawnManager.DestroyPowerupServerRpc((ulong)other.GetComponent<NetworkObject>().ObjectId);
             }
 
             StartCoroutine(PowerupCountdown());

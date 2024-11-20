@@ -17,6 +17,7 @@ namespace FishNet.Object
         /// True if OnStartClient was called.
         /// </summary>
         private bool _onStartClientCalled;
+        public ulong NetworkObjectId;
 
         #endregion
 
@@ -24,7 +25,7 @@ namespace FishNet.Object
         /// <summary>
         /// Called after all data is synchronized with this NetworkObject.
         /// </summary>
-        
+
         private void InvokeStartCallbacks(bool asServer, bool invokeSyncTypeCallbacks)
         {
             /* Note: When invoking OnOwnership here previous owner will
